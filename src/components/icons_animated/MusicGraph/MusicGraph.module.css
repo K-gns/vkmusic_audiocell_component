@@ -1,0 +1,10 @@
+.animated * {
+    transform-origin: bottom;
+    animation: equalizer-animation 1s infinite alternate;
+}
+
+@keyframes equalizer-animation {
+    0% { transform: scaleY(1); }
+    30% { transform: scaleY(1.2); }
+    100% { transform: scaleY(1); }
+}
