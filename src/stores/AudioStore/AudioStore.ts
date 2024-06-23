@@ -1,38 +1,25 @@
-import { makeAutoObservable } from "mobx";
+import { makeObservable, observable, action } from 'mobx';
 
-type Audio = {
-    id: number,
-    title: string,
-    artist: string,
-    url: string
+export interface AudioData {
+    currentAudioID: number;
+    title: string;
+    artist: string;
+    duration: string;
 }
 
-class AudioStore {
-    currentSongId : null | number = null;
-
-    songs: Audio[] = [
-        { id: 1, title: 'Grateful', artist: 'Neffex', url: '../../assets/mock_data/NEFFEX-Grateful.mp3' },
-        { id: 2, title: 'Song Two', artist: 'Artist B', url: '../../assets/mock_data/NEFFEX-Grateful.mp3'},
-    ];
+export class AudioStore {
+    audioData: AudioData | null = null;
 
     constructor() {
-        makeAutoObservable(this);
+        // Initialize observables and actions
+        makeObservable(this, {
+            audioData: observable,
+            setAudioData: action,
+        });
     }
 
-    public setCurrentSongId(id: number) {
-        this.currentSongId = id;
-    }
-
-    private getSong(id : number | null) {
-        return this.songs.find(song => song.id === id);
-    }
-
-    async loadSong(id: number) {
-        this.setCurrentSongId(id);
-        const path = this.getSong(id)?.url
-        if (path) {
-            return await import(path);
-        }
+    setAudioData(data: AudioData) {
+        this.audioData = data;
     }
 }
 
