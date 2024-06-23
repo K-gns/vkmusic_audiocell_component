@@ -5,6 +5,7 @@ import {Icon16MoreVertical} from "@vkontakte/icons";
 import {useEffect, useRef, useState} from "react";
 import MusicGraph from "../icons_animated/MusicGraph/MusicGraph.tsx";
 import AudioStore from "../../stores/AudioStore/AudioStore.ts";
+import audioTrack from '../../assets/mock_data/NEFFEX-Grateful.mp3'
 
 interface AudioCellProps {
     audioID: number;
@@ -14,34 +15,43 @@ interface AudioCellProps {
 
 export const AudioCell = (AudioCellProps: AudioCellProps) => {
 
-    const songId = AudioCellProps.audioID
-
-    // const [duration, setDuration] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isReady, setIsReady] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null)
+    const [isReady, setIsReady] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const  [timeDisplay, setTimeDisplay] = useState('00:00')
 
-    const [audioSrc, setAudioSrc] = useState("");
+    const [_, setAudioSrc] = useState("");
 
     const togglePlayPause = () => {
         if (isPlaying && isReady) {
             audioRef.current?.pause();
             setIsPlaying(false);
-            console.log(isPlaying)
         } else {
             audioRef.current?.play();
             setIsPlaying(true);
-            console.log(isPlaying)
         }
     };
 
+    const timeUpdate = (event: React.SyntheticEvent) => {
+        const currentTimeInSeconds = (event.target as HTMLAudioElement).currentTime;
+        setTimeDisplay(
+            formatTime(currentTimeInSeconds)
+        );
+    };
+
+    const formatTime = (timeInSeconds: number) => {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+
     useEffect(() => {
-        AudioStore.loadSong(songId)
+        AudioStore.loadSong(AudioCellProps.audioID)
             .then(module => {
                 if (module) {
                     setAudioSrc(module.default)
                 }
-                console.log(typeof module.default)
 
             })
             .catch(error => {
@@ -49,14 +59,20 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
             });
     }, [])
 
+    const onCanPlay = () => {
+        setIsReady(true);
+        if (audioRef.current) {
+            setTimeDisplay(formatTime(audioRef.current.duration));
+        }
+    };
+
 
     return (
         <Cell>
             <audio ref={audioRef} style={{display: `none`}}
-                   src={audioSrc}
-                   onCanPlay={() => {
-                       setIsReady(true);
-                   }}
+                   src={audioTrack}
+                   onCanPlay={() => onCanPlay()}
+                   onTimeUpdate={(event) => timeUpdate(event)}
             />
 
             <Tappable onClick={() => togglePlayPause()} className={styles.song_cell}>
@@ -72,7 +88,7 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
                 </Div>
                 <Div className={styles.song_cell_right}>
                     <Div className={styles.detail_container}>
-                        3:23
+                        {timeDisplay}
                     </Div>
                     <Div className={styles.more_container}>
                         <Div className={styles.more_button}>
