@@ -1,10 +1,17 @@
-import {Cell, Div, Tappable, Image, Headline, Subhead} from "@vkontakte/vkui";
+import {
+    Cell,
+    Div,
+    Tappable,
+    Image,
+    Headline,
+    Subhead,
+} from "@vkontakte/vkui";
 import styles from './AudioCell.module.css'
 import coverImage from '../../assets/audiocell_cover.png';
-import {Icon16MoreVertical} from "@vkontakte/icons";
 import {useEffect, useRef, useState} from "react";
 import MusicGraph from "../icons_animated/MusicGraph/MusicGraph.tsx";
 import AudioStore, {AudioData} from "../../stores/AudioStore/AudioStore.ts";
+import {MorePopover} from "../SettingModal/MorePopover.tsx";
 
 //Mock-data импорты
 import audioTrack from '../../assets/mock_data/NEFFEX-Grateful.mp3'
@@ -18,7 +25,7 @@ interface AudioCellProps {
 }
 
 export const AudioCell = (AudioCellProps: AudioCellProps) => {
-    const { audioID } = AudioCellProps;
+    const {audioID} = AudioCellProps;
 
     //Mock-объект - данные песни
     const songData = songsData[audioID - 1];
@@ -28,8 +35,6 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
     const [isReady, setIsReady] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [timeDisplay, setTimeDisplay] = useState(songData.duration)
-
-
 
 
     const handleClick = async () => {
@@ -111,8 +116,10 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
             <Tappable onClick={() => handleClick()} className={styles.song_cell}>
                 <Div className={styles.song_cell_left}>
                     <Div className={styles.image_container}>
-                        <Image className={`${styles.cover_image} ${isPlaying ? styles.playing : ""}`} src={coverImage} size={40} alt="cover"></Image>
-                        <MusicGraph className={`${styles.extra_icon} ${isPlaying ? "" : styles.hidden}`} animated={true}/>
+                        <Image className={`${styles.cover_image} ${isPlaying ? styles.playing : ""}`} src={coverImage}
+                               size={40} alt="cover"></Image>
+                        <MusicGraph className={`${styles.extra_icon} ${isPlaying ? "" : styles.hidden}`}
+                                    animated={true}/>
                     </Div>
                 </Div>
                 <Div className={styles['song_cell-middle']}>
@@ -125,7 +132,7 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
                     </Div>
                     <Div className={styles.more_container}>
                         <Div className={styles.more_button}>
-                            <Icon16MoreVertical color="var(--vkui--color_icon_accent)"/>
+                            <MorePopover/>
                         </Div>
                     </Div>
                 </Div>
