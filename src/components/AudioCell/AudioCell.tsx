@@ -19,6 +19,8 @@ interface AudioCellProps {
 
 export const AudioCell = (AudioCellProps: AudioCellProps) => {
     const { audioID } = AudioCellProps;
+
+    //Mock-объект - данные песни
     const songData = songsData[audioID - 1];
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -40,9 +42,10 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
     }
 
     const fetchSong = async (id: number) => {
-        // Тут бы я делал fetch трека с сервера по id, сейчас сделана mock-data
-        // Запрашиваю после клика, чтобы не грузить песню заранее,
-        // Иначе если у нас будет 30 таких AudioCell - будет неоптимально по ресурсам
+        // В реальном проекте я бы делал тут fetch аудио-файла с сервера по id,
+        // сейчас сделано с помощью mock-объекта.
+        // Аудиофайл запрашиваю только после клика, чтобы не грузить песню заранее,
+        // иначе если у нас на странице будет 20 таких AudioCell - будет неоптимально по ресурсам
         const fetchedSong = audioTrack;
         if (fetchedSong) {
             setAudioSrc(fetchedSong);
@@ -50,7 +53,8 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
                 currentAudioID: songData.id,
                 title: songData.title,
                 artist: songData.artist,
-                duration: songData.duration
+                duration: songData.duration,
+                currentTime: '0:00'
             };
             AudioStore.setAudioData(audioData);
         } else {
@@ -68,13 +72,11 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
         }
     };
 
-    // const throttledTimeUpdate = useCallback(throttle(timeUpdate, 1000), []);
-
-    const timeUpdate = (event: React.SyntheticEvent) => {
+    const timeUpdate = (event: React.SyntheticEvent<HTMLAudioElement>) => {
         const currentTimeInSeconds = (event.target as HTMLAudioElement).currentTime;
-        setTimeDisplay(
-            formatTime(currentTimeInSeconds)
-        );
+        const formattedTime = formatTime(currentTimeInSeconds)
+        setTimeDisplay(formattedTime);
+        AudioStore.updateCurrentTime(formattedTime);
     };
 
     const formatTime = (timeInSeconds: number) => {
@@ -92,7 +94,7 @@ export const AudioCell = (AudioCellProps: AudioCellProps) => {
         setIsReady(true);
         if (audioRef.current) {
             setTimeDisplay(formatTime(audioRef.current.duration));
-            // чтобы случайно не оглохнуть от 100% громкости:
+            // Затычка чтобы не оглохнуть от 100% громкости:
             audioRef.current.volume = 0.3;
         }
     };

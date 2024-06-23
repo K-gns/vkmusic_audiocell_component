@@ -5,21 +5,28 @@ export interface AudioData {
     title: string;
     artist: string;
     duration: string;
+    currentTime: string;
 }
 
 export class AudioStore {
     audioData: AudioData | null = null;
 
     constructor() {
-        // Initialize observables and actions
         makeObservable(this, {
             audioData: observable,
             setAudioData: action,
+            updateCurrentTime: action,
         });
     }
 
     setAudioData(data: AudioData) {
         this.audioData = data;
+    }
+
+    updateCurrentTime(time: string) {
+        if (this.audioData) {
+            this.audioData.currentTime = time;
+        }
     }
 }
 
